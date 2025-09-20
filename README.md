@@ -1,13 +1,13 @@
 # Brawl Stars API 近期對戰分析工具
 
-透過 Brawl Stars 官方 API 來查詢玩家對戰記錄並進行統計分析的 Python 工具。
+透過 Brawl Stars 官方 API 查詢玩家對戰記錄並進行統計分析的 Python 工具。
 
 ## 功能
 
 - 查詢指定玩家的近期對戰記錄
 - 統計玩家最常用的角色
 - 顯示對戰期間（台灣時區）
-- 分析對戰場數
+- 統一的錯誤處理機制
 
 ## 環境需求
 
@@ -89,18 +89,22 @@ Brawl Stars 近期對戰統計
 
 ```
 brawl_stars_api/
-├── app.py              # 主程式檔案
-├── requirements.txt    # Python 依賴套件清單
-├── .env               # 環境變數檔案（需要自行創建）
-├── venv/              # Python 虛擬環境
+├── app.py              # 主程式
+├── error_handler.py    # 錯誤處理模組
+├── requirements.txt    # 依賴套件
 └── README.md          # 說明文件
 ```
 
-## 依賴套件
+## 錯誤處理模組
 
-- `requests`: HTTP 請求庫
-- `python-dotenv`: 環境變數管理
-- `certifi`: SSL 憑證驗證
-- `charset-normalizer`: 字符編碼檢測
-- `idna`: 國際化域名支援
-- `urllib3`: HTTP 客戶端庫
+`error_handler.py` 提供統一的 API 錯誤處理：
+
+- **ClientError**: 解析官方 API 錯誤回應結構
+- **BrawlStarsAPIError**: 自定義錯誤類別
+- **ErrorHandler**: 處理各種異常類型
+  - HTTP 錯誤 (400, 403, 404, 429, 500, 503)
+  - 網路連線錯誤
+  - JSON 解析錯誤
+  - 一般異常
+
+錯誤訊息會顯示狀態碼和 API 回應中的原始錯誤訊息。

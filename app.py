@@ -4,19 +4,16 @@ import os
 from dotenv import load_dotenv
 from collections import Counter
 from datetime import datetime, timezone, timedelta
+from error_handler import ErrorHandler, BrawlStarsAPIError
 
 # 載入 .env 檔案
 load_dotenv()
 
 # 使用者輸入玩家ID
-print("")
 print("Brawl Stars 近期對戰統計")
 print("=" * 40)
 PLAYER_TAG = input("請輸入玩家標籤 (例如: 1ABCD0ABC): ").strip()
-
-print("")
 print(f"正在查詢玩家 #{PLAYER_TAG} 的戰鬥記錄...")
-print("")
 
 # API URL
 url = f"https://api.brawlstars.com/v1/players/%23{PLAYER_TAG}/battlelog"
@@ -92,9 +89,9 @@ try:
     if battle_times:
         oldest_battle = min(battle_times)
         newest_battle = max(battle_times)
-        print(f" 對戰期間: {oldest_battle.strftime('%Y-%m-%d %H:%M')} 至 {newest_battle.strftime('%Y-%m-%d %H:%M')} (台灣時間)")
+        print(f" 期間: {oldest_battle.strftime('%Y-%m-%d %H:%M')} 至 {newest_battle.strftime('%Y-%m-%d %H:%M')} (台灣時間)")
     else:
-        print(" 對戰期間: 無法解析時間資料")
+        print(" 期間: 無法解析時間資料")
     
     print("=" * 40)
     
@@ -108,8 +105,11 @@ try:
     print("=" * 40)
     
 except requests.exceptions.RequestException as e:
-    print(f"API 請求失敗: {e}")
-except json.JSONDecodeError:
-    print("無法解析 API 回應")
+    error = ErrorHandler.handle_request_exception(e)
+    ErrorHandler.print_error(error)
+except json.JSONDecodeError as e:
+    error = ErrorHandler.handle_json_decode_error(e)
+    ErrorHandler.print_error(error)
 except Exception as e:
-    print(f"發生錯誤: {e}")
+    error = ErrorHandler.handle_general_error(e)
+    ErrorHandler.print_error(error)
